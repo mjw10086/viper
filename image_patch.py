@@ -94,8 +94,6 @@ class ImagePatch:
             An int describing the position of the top border of the crop's bounding box in the original image.
 
         """
-        self.filePath = f"{uuid.uuid4()}.jpg"
-        save_image(image, os.path.join(os.getcwd(), "static"), self.filePath)
         if isinstance(image, Image.Image):
             image = transforms.ToTensor()(image)
         elif isinstance(image, np.ndarray):
@@ -130,6 +128,8 @@ class ImagePatch:
         if self.cropped_image.shape[1] == 0 or self.cropped_image.shape[2] == 0:
             raise Exception("ImagePatch has no area")
 
+        self.filePath = f"{uuid.uuid4()}.jpg"
+        save_image(self.cropped_image, os.path.join(os.getcwd(), "static"), self.filePath)
         self.possible_options = load_json('./useful_lists/possible_options.json')
 
     def forward(self, model_name, *args, **kwargs):

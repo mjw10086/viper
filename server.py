@@ -42,8 +42,8 @@ def chatWithViper():
 
     im = load_image(image_path)
     code = get_code(query)
-    query_result, exe_result = execute_code_return_result(code, im, show_intermediate_steps=True)
-    all_result = {"final_result": query_result, "step_result": exe_result}
+    code, query_result, exe_result = execute_code_return_result(code, im, show_intermediate_steps=True)
+    all_result = {"code": code, "final_result": query_result, "step_result": exe_result}
 
     result = json.dumps(all_result, cls=CustomJSONEncoder, indent=4)
     

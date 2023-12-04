@@ -326,7 +326,7 @@ def execute_code_return_result(code, im, show_intermediate_steps=True):
             print(f"Encountered error {e} when trying to run with visualizations. Trying from scratch.")
             exec(compile(code, 'Codex', 'exec'), globals())
             result = execute_command(im, my_fig, time_wait_between_lines, syntax)  # The code is created in the exec()
-        return result, exe_result
+        return code, result, exe_result
 
 def show_single_image(im):
     im = Image.fromarray((im.detach().cpu().numpy().transpose(1, 2, 0) * 255).astype("uint8"))
