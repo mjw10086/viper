@@ -186,9 +186,14 @@ def CodexAtLine(lineno, syntax, time_wait_between_lines=1.):
     syntax.stylize_range('on red', (lineno + 1, 0), (lineno + 1, 80))
     time.sleep(time_wait_between_lines)
 
+global_array_name = 'exe_result'
+globals()[global_array_name] = []
 
 def show_all(lineno, value, valuename, fig=None, usefig=True, disp=True, console_in=None, time_wait_between_lines=None,
              lastlineno=[-1]):
+    global exe_result
+    exe_result.append({"lineno":lineno, "valuename": valuename, "value": value})
+    
     time.sleep(0.1)  # to avoid race condition!
 
     if console_in is None:
@@ -307,6 +312,20 @@ def execute_code(code, im, show_intermediate_steps=True):
     console.rule(f"[bold]Final Result[/bold]", style="chartreuse2")
     show_all(None, result, 'Result', fig=f, usefig=usefig, disp=False, console_in=console, time_wait_between_lines=0)
 
+def execute_code_return_result(code, im, show_intermediate_steps=True):
+    code, syntax = code
+    code_line = inject_saver(code, show_intermediate_steps, syntax, time_wait_between_lines, console)
+
+    with Live(Padding(syntax, 1), refresh_per_second=10, console=console, auto_refresh=True) as live:
+        my_fig = plt.figure(figsize=(4, 4))
+        try:
+            exec(compile(code_line, 'Codex', 'exec'), globals())
+            result = execute_command(im, my_fig, time_wait_between_lines, syntax)  # The code is created in the exec()
+        except Exception as e:
+            print(f"Encountered error {e} when trying to run with visualizations. Trying from scratch.")
+            exec(compile(code, 'Codex', 'exec'), globals())
+            result = execute_command(im, my_fig, time_wait_between_lines, syntax)  # The code is created in the exec()
+        return result
 
 def show_single_image(im):
     im = Image.fromarray((im.detach().cpu().numpy().transpose(1, 2, 0) * 255).astype("uint8"))

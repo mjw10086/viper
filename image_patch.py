@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import uuid
 import numpy as np
 import re
 import torch
@@ -15,6 +17,24 @@ from utils import show_single_image, load_json
 from vision_processes import forward, config
 
 console = Console(highlight=False)
+
+def save_image(image_data, output_folder, filename):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    if isinstance(image_data, Image.Image):
+        img = image_data
+    elif isinstance(image_data, torch.Tensor):
+        img = Image.fromarray(image_data.mul(255).byte().permute(1, 2, 0).cpu().numpy())
+    elif isinstance(image_data, np.ndarray):
+        if image_data.dtype == np.float32 or image_data.dtype == np.float64:
+            img = Image.fromarray((image_data * 255).astype(np.uint8))
+        else:
+            img = Image.fromarray(image_data)
+    else:
+        raise TypeError("Unsupported image data type")
+
+    img.save(os.path.join(output_folder, filename))
 
 
 class ImagePatch:
@@ -74,7 +94,8 @@ class ImagePatch:
             An int describing the position of the top border of the crop's bounding box in the original image.
 
         """
-
+        self.filePath = f"{uuid.uuid4()}.jpg"
+        save_image(image, os.path.join(os.getcwd(), "static"), self.filePath)
         if isinstance(image, Image.Image):
             image = transforms.ToTensor()(image)
         elif isinstance(image, np.ndarray):
@@ -155,8 +176,8 @@ class ImagePatch:
             #     mask = all_areas == all_areas.max()  # At least return one element
             all_object_coordinates = all_object_coordinates[mask]
 
-
-        return [self.crop(*coordinates) for coordinates in all_object_coordinates]
+        result = [self.crop(*coordinates) for coordinates in all_object_coordinates]
+        return result
 
     def exists(self, object_name) -> bool:
         """Returns True if the object specified by object_name is found in the image, and False otherwise.
