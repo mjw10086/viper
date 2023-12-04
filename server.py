@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 import os
+import json
+from main_simple_lib import *
 
 app = Flask(__name__, static_folder=os.path.join(os.getcwd(), "static"), static_url_path='/static')
 
@@ -26,6 +28,11 @@ class CustomJSONEncoder(json.JSONEncoder):
             return {'url': obj.filePath}
         return json.JSONEncoder.default(self, obj)
 
+
+@app.route('/', methods=['GET'])
+def index():
+    return "Hello World"
+
 @app.route('/v1per', methods=['POST'])
 def chatWithViper():
     try:
@@ -33,18 +40,14 @@ def chatWithViper():
     except Exception as e:
         return e.message, 400
 
-    global_array_name = 'exe_result'
-    globals()[global_array_name] = []
-
     im = load_image(image_path)
     code = get_code(query)
-    query_result = execute_code_return_result(code, im, show_intermediate_steps=True)
-    global exe_result
+    query_result, exe_result = execute_code_return_result(code, im, show_intermediate_steps=True)
     all_result = {"final_result": query_result, "step_result": exe_result}
 
     result = json.dumps(all_result, cls=CustomJSONEncoder, indent=4)
     
-    return Response(response=result, status=200, mimetype='application/json')
+    return result, 200
 
 
 if __name__ == '__main__':
