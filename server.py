@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 import os
 
-app = Flask(__name__)
 app = Flask(__name__, static_folder=os.path.join(os.getcwd(), "static"), static_url_path='/static')
 
 
