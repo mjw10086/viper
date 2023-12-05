@@ -40,6 +40,9 @@ def chatWithViper():
     except Exception as e:
         return e.message, 400
 
+    global_array_name = 'exe_result'
+    globals()[global_array_name] = []
+    
     im = load_image(image_path)
     code = get_code(query)
     code, query_result, exe_result = execute_code_return_result(code, im, show_intermediate_steps=True)
