@@ -15,7 +15,7 @@ def handle_request():
         raise Exception('No selected image')
 
     query = request.form.get('query', '')
-    image_path = os.path.join("./", "uploads", image.filename)
+    image_path = os.path.join("./", image.filename)
 
     image.save(image_path)
 
@@ -39,9 +39,6 @@ def chatWithViper():
         image_path, query = handle_request()
     except Exception as e:
         return e.message, 400
-
-    global_array_name = 'exe_result'
-    globals()[global_array_name] = []
     
     im = load_image(image_path)
     code = get_code(query)

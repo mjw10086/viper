@@ -189,6 +189,10 @@ def CodexAtLine(lineno, syntax, time_wait_between_lines=1.):
 global_array_name = 'exe_result'
 globals()[global_array_name] = []
 
+def clean_res():
+    global exe_result
+    exe_result = []
+
 def show_all(lineno, value, valuename, fig=None, usefig=True, disp=True, console_in=None, time_wait_between_lines=None,
              lastlineno=[-1]):
     global exe_result
@@ -313,7 +317,7 @@ def execute_code(code, im, show_intermediate_steps=True):
     show_all(None, result, 'Result', fig=f, usefig=usefig, disp=False, console_in=console, time_wait_between_lines=0)
 
 def execute_code_return_result(code, im, show_intermediate_steps=True):
-    global exe_result
+    clean_res()
     code, syntax = code
     code_line = inject_saver(code, show_intermediate_steps, syntax, time_wait_between_lines, console)
 
